@@ -1,24 +1,83 @@
-# Weather frontend (React + Vite)
+# 🌤️ WeatherApp - React Frontend
 
-Lightweight UI that calls the Spring Boot weather microservice and shows the raw JSON for debugging.
+[![React](https://img.shields.io/badge/React-19.2.4-blue.svg)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-8.0.0-646CFF.svg)](https://vitejs.dev/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-## Quick start
-- `cd WeatherApp-React--Frontend-`
-- `npm install`
-- Copy `.env.example` to `.env.local` if you need a different backend host/port.
-- `npm run dev -- --host`
-- Open the URL shown (default http://localhost:5173).
+A sleek, responsive, and high-performance weather visualization dashboard built with React 19 and Vite. This frontend provides a premium user experience with real-time weather data visualization and dynamic UI elements.
 
-## API wiring
-- Default call: `GET /api/weather?city=<city>` with CORS handled by Vite’s proxy.
-- Health check: `GET /actuator/health`.
-- Dev proxy forwards `/api` and `/actuator` to `http://localhost:8084` unless you override.
-- If you prefer absolute URLs from the browser, set `VITE_API_BASE_URL` in `.env.local`.
+---
 
-## Environment variables
-- `VITE_API_BASE_URL` — absolute base URL for the API (skip the trailing slash). Leave blank to use the proxy.
-- `VITE_API_PROXY_TARGET` — backend address for the dev proxy (defaults to `http://localhost:8084`).
+## 🌟 Features
 
-## Notes
-- The UI falls back to sample data if the backend is unreachable so you can design without the API up.
-- Source entry: `src/App.jsx`, proxy config: `vite.config.js`.
+- **Dynamic Weather Dashboard:** Real-time visualization of weather metrics.
+- **Modern UI/UX:** Clean, premium design with focus on usability.
+- **Optimized Performance:** Built with Vite for ultra-fast HMR and building.
+- **Responsive Design:** Fully adaptive layout for mobile, tablet, and desktop.
+- **API Integration:** Seamless connectivity with the Spring Boot microservice.
+
+---
+
+## 🚀 Tech Stack
+
+- **Core:** React 19 (Latest)
+- **Tooling:** Vite 8.0
+- **Styling:** Modern Vanilla CSS
+- **Deployment Ready:** Scalable architecture for modern cloud providers.
+
+---
+
+## 🛠 Setup & Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repo-url>
+   cd WeatherApp-React--Frontend-
+   ```
+
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment:**
+   Create a `.env` file based on `.env.example`:
+   ```env
+   VITE_API_BASE_URL=http://localhost:8080/api
+   ```
+
+4. **Start Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🧩 Component Architecture
+
+- `src/components/` - Reusable UI components.
+- `src/services/` - API client and data fetching logic.
+- `src/App.jsx` - Main application entry point.
+
+---
+
+## 🔭 Future Roadmap
+
+### 📊 Predictive Visualization
+- Implementation of dynamic charts for AI-powered weather predictions.
+- Advanced mapping and radar visualizations.
+
+### 🧪 Testing & DevOps
+- **Microservice Testing:** Integration of Cypress or Playwright for End-to-End (E2E) testing.
+- **Dockerization:** Future support for containerized frontend deployments.
+- **CI/CD:** Automated builds and deployment pipelines for static hosting (Vercel/Netlify).
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+Designed with ❤️ by [Vimukthi Buddika](https://github.com/BOBBY01151).
