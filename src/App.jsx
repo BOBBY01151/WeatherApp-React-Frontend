@@ -1,24 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { apiBaseHint, checkHealth, fetchWeather } from './services/weatherApi'
 
 const sampleWeather = {
-  city: 'Sample City',
-  temperature: 22.4,
-  description: 'Clear sky — sample data',
-  humidity: 58,
-  windSpeed: 3.2,
-  pressure: 1014,
+  city: 'San Francisco',
+  temperature: 18.5,
+  description: 'Partly cloudy — demo mode',
+  humidity: 62,
+  windSpeed: 4.1,
+  pressure: 1012,
   recordedAt: new Date().toISOString(),
-  raw: { source: 'sample', note: 'Shown when the backend is unreachable' },
+  raw: { source: 'demo', note: 'Start the Spring Boot backend to see real-time data' },
 }
 
 const statusLabels = {
-  idle: 'Not checked',
-  checking: 'Checking…',
-  ok: 'Connected',
-  degraded: 'Degraded',
-  offline: 'Offline',
+  idle: 'Sync Pending',
+  checking: 'Synchronizing…',
+  ok: 'Node Active',
+  degraded: 'Link Degraded',
+  offline: 'Node Offline',
 }
 
 function App() {
@@ -28,19 +28,28 @@ function App() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(null)
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   const handleHealth = async () => {
     setStatus('checking')
-    const payload = await checkHealth()
-    const isUp = (payload.status || '').toUpperCase() === 'UP'
-
-    if (isUp) {
-      setStatus('ok')
-      setError('')
-    } else {
+    try {
+      const payload = await checkHealth()
+      const isUp = (payload.status || '').toUpperCase() === 'UP'
+      if (isUp) {
+        setStatus('ok')
+        setError('')
+      } else {
+        setStatus('offline')
+        setError(`Connection refused. Verify Spring Boot is running on port 8084.`)
+      }
+    } catch (err) {
       setStatus('offline')
-      const code = payload.httpStatus ? ` (${payload.httpStatus})` : ''
-      setError(`Health check failed${code}. Is Spring Boot running on port 8084?`)
+      setError('Network error. Is the backend unreachable?')
     }
   }
 
@@ -58,7 +67,7 @@ function App() {
       setLastUpdated(new Date())
     } catch (err) {
       setStatus('offline')
-      setError('Could not reach Spring Boot. Showing sample data instead.')
+      setError('Could not reach backend. Switched to demo data.')
       setWeather({ ...sampleWeather, city: city.trim() })
     } finally {
       setLoading(false)
@@ -71,24 +80,26 @@ function App() {
     <div className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">Weather microservice UI</p>
-          <h1>React frontend wired for Spring Boot</h1>
+          <p className="eyebrow">
+            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })} • Weather Intel
+          </p>
+          <h1>Atmospheric Intelligence</h1>
           <p className="lede">
-            Call your backend from the browser without fighting CORS. Use the form to hit
-            <span className="code"> /api/weather</span> and see the JSON instantly.
+            Advanced weather monitoring interface powered by Spring Boot microservices. 
+            Real-time data synchronization with secure API endpoints.
           </p>
         </div>
         <div className={`status-pill ${status}`}>
           <span className="dot" />
-          {statusLabels[status] || 'Unknown'}
+          {statusLabels[status] || 'Unknown State'}
         </div>
       </header>
 
       <section className="panel">
         <div className="panel-header">
           <div>
-            <p className="hint">Backend base: {apiBaseHint}</p>
-            <p className="hint">Health endpoint: GET /actuator/health</p>
+            <p className="hint">Gateway: {apiBaseHint}</p>
+            <p className="hint">Health: actuator/health</p>
           </div>
           <button
             type="button"
@@ -96,40 +107,38 @@ function App() {
             onClick={handleHealth}
             disabled={loading || status === 'checking'}
           >
-            {status === 'checking' ? 'Checking…' : 'Check health'}
+            {status === 'checking' ? 'Syncing…' : 'Sync Gateway'}
           </button>
         </div>
 
         <form className="query" onSubmit={handleSubmit}>
-          <label htmlFor="city">City</label>
+          <label htmlFor="city">Target Location</label>
           <div className="input-row">
             <input
               id="city"
               name="city"
               autoComplete="off"
-              placeholder="e.g. Seattle"
+              placeholder="Enter city..."
               value={city}
               onChange={(event) => setCity(event.target.value)}
             />
             <button type="submit" disabled={loading || !city.trim()}>
-              {loading ? 'Calling…' : 'Call /api/weather'}
+              {loading ? 'Consulting...' : 'Fetch Forecast'}
             </button>
           </div>
         </form>
 
-        {error ? <div className="callout error">{error}</div> : null}
+        {error && <div className="callout error"><span>⚠️</span> {error}</div>}
         <div className="callout neutral">
-          Tip: keep Spring Boot on port 8084 in dev, or set
-          <span className="code"> VITE_API_BASE_URL</span> /
-          <span className="code"> VITE_API_PROXY_TARGET</span>.
+          <span>ℹ️</span> Pro Tip: Ensure your microservice backend is active for live telemetry.
         </div>
       </section>
 
       <section className="grid">
-        <article className="card highlight">
+        <article className="card">
           <div className="card-meta">
             <span className="pill">{weather.city}</span>
-            <span className="muted">Updated {formatTimestamp(displayedTimestamp)}</span>
+            <span className="muted">Refreshed: {formatTimestamp(displayedTimestamp)}</span>
           </div>
           <div className="temperature">
             {typeof weather.temperature === 'number' ? weather.temperature.toFixed(1) : '—'}
@@ -145,8 +154,8 @@ function App() {
 
         <article className="card code">
           <div className="card-meta">
-            <strong>Raw response</strong>
-            <span className="muted">Great for debugging field names</span>
+            <strong>Stream Data</strong>
+            <span className="muted">Live JSON Payload</span>
           </div>
           <pre>
             <code>{JSON.stringify(weather.raw ?? weather, null, 2)}</code>
@@ -174,8 +183,8 @@ function formatTimestamp(value) {
   const date = value instanceof Date ? value : new Date(value)
   if (Number.isNaN(date.getTime())) return '—'
   return new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
     timeStyle: 'short',
+    dateStyle: 'medium',
   }).format(date)
 }
 
