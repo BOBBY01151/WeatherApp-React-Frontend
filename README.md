@@ -41,9 +41,10 @@ A sleek, responsive, and high-performance weather visualization dashboard built 
    ```
 
 3. **Configure Environment:**
-   Create a `.env` file based on `.env.example`:
+   Create a `.env` file based on `.env.example` (usually you can leave `VITE_API_BASE_URL` empty and use the dev proxy):
    ```env
-   VITE_API_BASE_URL=http://localhost:8080/api
+   VITE_API_BASE_URL=http://localhost:8084
+   VITE_API_PROXY_TARGET=http://localhost:8084
    ```
 
 4. **Start Development Server:**

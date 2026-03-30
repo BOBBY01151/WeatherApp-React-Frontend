@@ -17,7 +17,9 @@ export async function fetchWeather(city) {
 
 export async function checkHealth() {
   try {
-    const res = await fetch(withBase('/actuator/health'))
+    const res = await fetch(withBase('/api/ping'), {
+      headers: { Accept: 'application/json' },
+    })
     if (!res.ok) {
       return { status: 'DOWN', httpStatus: res.status }
     }
@@ -25,4 +27,34 @@ export async function checkHealth() {
   } catch (err) {
     return { status: 'DOWN', error: err?.message || 'Unavailable' }
   }
+}
+
+export async function saveObservation(observation) {
+  const res = await fetch(withBase('/api/observations'), {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(observation),
+  })
+
+  if (!res.ok) {
+    const message = await res.text()
+    throw new Error(message || `Save failed (${res.status})`)
+  }
+  return res.json()
+}
+
+export async function listObservations(limit = 20) {
+  const res = await fetch(
+    withBase(`/api/observations?limit=${encodeURIComponent(limit)}`),
+    { headers: { Accept: 'application/json' } },
+  )
+
+  if (!res.ok) {
+    const message = await res.text()
+    throw new Error(message || `Load failed (${res.status})`)
+  }
+  return res.json()
 }
